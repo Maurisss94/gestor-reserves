@@ -19,3 +19,12 @@ function gestor_init() {
 }
 
 add_action('init', 'gestor_init');
+
+function gestor_setup() {
+	register_nav_menu('main-menu', 'Menú principal');
+
+	add_theme_support('post-thumbnails', array('post', 'page'));
+
+}
+
+add_action('after_setup_theme', 'gestor_setup');
