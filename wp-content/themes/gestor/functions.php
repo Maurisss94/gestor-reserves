@@ -28,3 +28,6 @@ function gestor_setup() {
 }
 
 add_action('after_setup_theme', 'gestor_setup');
+
+
+
