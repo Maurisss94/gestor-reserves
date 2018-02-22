@@ -28,13 +28,13 @@ $page_reserva = get_field('page_reserva', 'options');
 				<div class="form-group row">
 					<label for="data-ini" class="col-sm-2 col-form-label">Data inici</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="datepicker-ini" name="datepicker-ini" value="">
+						<input type="text" class="form-control" id="datepicker-ini" name="datepicker-ini" >
 					</div>
 				</div>
 				<div class="form-group row">
 					<label for="data-fi" class="col-sm-2 col-form-label">Data Fi</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="datepicker-fi" name="datepicker-fi" value="">
+						<input type="text" class="form-control" id="datepicker-fi" name="datepicker-fi" >
 					</div>
 				</div>
 

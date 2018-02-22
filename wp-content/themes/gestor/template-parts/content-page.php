@@ -20,7 +20,19 @@ else:
 	$ocupants = filter_input(INPUT_POST, 'ocupants');
 	$animals = filter_input(INPUT_POST, 'animals-check') == 'Yes' ? 1 : 0;
 
-	var_dump($_POST);
+	$data_filter = gestor_check_datas($diaIni, $diaFI);
+	$llocRecollida_filter = gestor_check_llocs($llocRecollida, $optionsRecollida);
+	$llocRetorn_filter = gestor_check_llocs($llocRetorn, $optionsRecollida);
+	//var_dump($llocRecollida_filter['nom']);
+    if($animals == 0){
+        $argsAnimals =array();
+    }else{
+        $argsAnimals = array(
+	        'key'		=> 'accepta_animals',
+	        'compare'	=> '=',
+	        'value'		=> $animals,
+        );
+    }
 
 	$args = array(
 		'post_type' => 'furgoneta',
@@ -32,11 +44,7 @@ else:
 				'compare'	=> '>=',
 				'value'		=> $ocupants,
 			),
-			array(
-				'key'		=> 'accepta_animals',
-				'compare'	=> '=',
-				'value'		=> $animals,
-			)
+			$argsAnimals,
 		),
 		'order' => 'ASC',
 		'fields' => 'ids'
@@ -44,17 +52,18 @@ else:
 	$furgosDisponibes = query_posts($args);
 	var_dump($furgosDisponibes);
 
-	$id = wp_insert_post(array(
-	        'post_title'=>'test',
-            'post_type'=>'reserva',
-            'post_content'=>'demo text',
-
-    ));
+//	$id = wp_insert_post(array(
+//	        'post_title'=>'test',
+//            'post_type'=>'reserva',
+//            'post_content'=>'demo text',
+//            'post_status'  => 'publish',
+//
+//    ));
 
 
     ?>
 <div>
-
+<h1>RESERVA</h1>
 </div>
 
 <?php endif ?>

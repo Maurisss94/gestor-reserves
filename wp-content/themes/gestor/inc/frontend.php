@@ -45,3 +45,22 @@ function add_menuclass($ulclass) {
 	return preg_replace('/<a /', '<a class="nav-link"', $ulclass);
 }
 add_filter('wp_nav_menu','add_menuclass');
+
+function gestor_check_llocs( $llocRecollida, $optionsRecollida ) {
+	$res = array(
+		'nom' => '',
+		'preu' => -1
+	); $i = 1; $trobat = false;
+	while ( $i <= sizeof( $optionsRecollida ) and ! $trobat ) {
+		if ( $i == $llocRecollida ) {
+			$res['nom']= $optionsRecollida[ $i - 1 ]['nom_lloc'];
+			$res['preu']= $optionsRecollida[ $i - 1 ]['preu_lloc'];
+			$trobat = true;
+		}
+		$i ++;
+	}
+	return $res;
+}
+function gestor_check_datas($diaIni, $diaFI){
+	return ($diaFI - $diaIni >=2 and $diaFI > $diaIni);
+}
