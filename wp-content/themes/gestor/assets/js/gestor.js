@@ -35,8 +35,8 @@
     var someFormattedDate = dd + '/'+ mm + '/'+ y;
     var someFormattedDateFi = dd2 + '/'+ mm + '/'+ y;
 
-    $("#datepicker-ini").attr("placeholder", someFormattedDate);
-    $("#datepicker-fi").attr("placeholder", someFormattedDateFi);
+    $("#datepicker-ini").attr("value", someFormattedDate);
+    $("#datepicker-fi").attr("value", someFormattedDateFi);
 
 
 
