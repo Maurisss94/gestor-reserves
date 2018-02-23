@@ -1,0 +1,13 @@
+.nav-pills li {
+    width: 20%;
+}
+.navbar-inner {
+    width: 100%;
+}
+.steps {
+    padding: 0;
+    padding-top: 15px;
+}
+.progress-container{
+    margin-bottom: 50px;
+}

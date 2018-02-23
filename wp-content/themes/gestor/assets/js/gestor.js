@@ -25,7 +25,11 @@
     $( "#datepicker-fi" ).datepicker({
         minDate: '+2D',
         defaultDate: +7
+
     });
+    /**
+     * TODO: Canviar manera d'indicar el valor al datepicker
+     */
     var someDate = new Date();
     var dd = someDate.getDate()+2;
     var dd2 = someDate.getDate()+7;
@@ -39,5 +43,37 @@
     $("#datepicker-fi").attr("value", someFormattedDateFi);
 
 
+    initStepBar();
+
+
+
+    function initStepBar() {
+        $('.next').click(function(){
+
+            var nextId = $(this).parents('.tab-pane').next().attr("id");
+            $('[href=#'+nextId+']').tab('show');
+            return false;
+
+        })
+
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+            //update progress
+            var step = $(e.target).data('step');
+            var percent = (parseInt(step) / 5) * 100;
+
+            $('.progress-bar').css({width: percent + '%'});
+            $('.progress-bar').text("Step " + step + " of 5");
+
+            //e.relatedTarget // previous tab
+
+        })
+
+        $('.first').click(function(){
+
+            $('#myWizard a:first').tab('show')
+
+        })
+    }
 
 })(jQuery);
