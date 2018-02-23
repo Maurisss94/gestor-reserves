@@ -65,9 +65,9 @@ register_post_type('reserva', array(
 	'publicly_queryable' => true,
 	'exclude_from_search' => false,
 	'hierarchical' => false,
-	'rewrite' => array('slug' => untrailingslashit(_x('furgoneta', 'post type slug')), 'with_front' => false, 'feeds' => true),
+	'rewrite' => array('slug' => untrailingslashit(_x('reserva', 'post type slug')), 'with_front' => false, 'feeds' => true),
 	'query_var' => true,
 	'supports' => array('title', 'custom-fields', 'page-attributes'),
-	'has_archive' => 'furgonetes',
+	'has_archive' => 'reserva',
 	'show_in_nav_menus' => true
 ));

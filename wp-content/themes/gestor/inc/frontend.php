@@ -62,5 +62,19 @@ function gestor_check_llocs( $llocRecollida, $optionsRecollida ) {
 	return $res;
 }
 function gestor_check_datas($diaIni, $diaFI){
-	return ($diaFI - $diaIni >=2 and $diaFI > $diaIni);
+
+	$date = str_replace('/', '-', $diaIni);
+	$date2 = str_replace('/', '-', $diaFI);
+	$dataI =  new DateTime($date);
+	$dataF =  new DateTime($date2);
+	$intervalDies = date_diff($dataI, $dataF);
+	$intervalDies = $intervalDies->format('%R%a');
+	$intervalDies = intval($intervalDies);
+
+	return ($intervalDies >=2 and $dataF > $dataI);
+}
+function gestor_createData($data, $type){
+	$dob_str = $data;
+	$date = DateTime::createFromFormat($type, $dob_str);
+	return $date->format('Ymd');
 }

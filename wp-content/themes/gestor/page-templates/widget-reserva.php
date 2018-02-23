@@ -11,6 +11,22 @@ get_header();
 $optionsRecollida = get_field('lloc_recollida_tornada', 'option') ? get_field('lloc_recollida_tornada', 'option') : array();
 $numOcupants = get_field('num_ocupants_maxim', 'options') ? get_field('num_ocupants_maxim', 'options') : 6;
 $page_reserva = get_field('page_reserva', 'options');
+
+
+$id = wp_insert_post(array(
+    'ID' => '860',
+	'post_title'=>'test',
+	'post_type'=>'reserva',
+	'post_status'  => 'publish',
+
+));
+$dateI = gestor_createData('25/02/2018', 'd/m/Y');
+$dateF = gestor_createData('28/02/2018', 'd/m/Y');
+
+$postID = update_field('id_furgoneta', '800', $id);
+$postID = update_field('data_inici', $dateI, $id);
+$postID = update_field('data_fi', $dateF, $id);
+
 ?>
 
 	<div class="container">
