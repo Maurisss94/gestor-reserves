@@ -11,3 +11,26 @@
 .progress-container{
     margin-bottom: 50px;
 }
+.available .desc , .unavailable .desc{
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.available img, .unavailable img{
+    width: 100%;
+}
+.available .info .more-info, .unavailable .info .more-info{
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.available .info, .unavailable .info{
+    font-size: 12px
+}
+.available .info h4, .unavailable .info h4{
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.reserva .row {
+    margin-bottom: 20px;
+}
