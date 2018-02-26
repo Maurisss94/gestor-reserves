@@ -8,6 +8,8 @@
 /* Template Name: widget-reserva */
 get_header();
 
+$_SESSION['user_id'] = get_current_user_id();
+
 $optionsRecollida = get_field('lloc_recollida_tornada', 'option') ? get_field('lloc_recollida_tornada', 'option') : array();
 $numOcupants = get_field('num_ocupants_maxim', 'options') ? get_field('num_ocupants_maxim', 'options') : 6;
 $page_reserva = get_field('page_reserva', 'options');
@@ -20,8 +22,8 @@ $id = wp_insert_post(array(
 	'post_status'  => 'publish',
 
 ));
-$dateI = gestor_createData('25/02/2018', 'd/m/Y');
-$dateF = gestor_createData('28/02/2018', 'd/m/Y');
+$dateI = gestor_createData('1/03/2018', 'd/m/Y');
+$dateF = gestor_createData('8/03/2018', 'd/m/Y');
 
 $postID = update_field('id_furgoneta', '800', $id);
 $postID = update_field('data_inici', $dateI, $id);
