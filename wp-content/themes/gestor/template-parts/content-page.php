@@ -34,7 +34,7 @@ else:
     );
 	//var_dump($llocRecollida_filter['nom']);
 
-    //Comprovar que els filtres estan correctes, sino redireccionar.
+    //TODO: Comprovar que els filtres estan correctes, sino redireccionar.
 
 //Mirem si hi han reserves amb aquestes dates i les obtenim..
 $furgosReservades = gestor_get_reserved_vans($diaIni, $diaFI);
