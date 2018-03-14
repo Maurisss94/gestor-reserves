@@ -3,8 +3,34 @@
     $(document).ready(function(){
         initStepBar();
         initCalendar();
-
+        bookingProcess();
     });
+    
+    function bookingProcess() {
+        var checkAnimals = $('.animals');
+        var numOcupants, animals;
+        $('#ocupants, input[type=radio][name=opcio-animals]').on('change', function (e) {
+
+            var currentElement = $(e.target)[0].id;
+            if(currentElement === 'ocupants')
+                numOcupants = this.value;
+            else
+                animals = this.value;
+
+            if(checkAnimals.hasClass('hide')){
+                checkAnimals.removeClass('hide');
+            }
+
+            if(numOcupants && animals){
+                console.log('peticio');
+                //fer peticio ajax
+            }
+
+        });
+
+
+
+    }
 
 
     function initCalendar() {
@@ -51,6 +77,8 @@
         $("#datepicker-ini").attr("value", someFormattedDate);
         $("#datepicker-fi").attr("value", someFormattedDateFi);
     }
+
+
 
 
     function initStepBar() {
