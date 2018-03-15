@@ -12,11 +12,23 @@ $_SESSION['user_id'] = get_current_user_id();
 
 $optionsRecollida = get_field('lloc_recollida_tornada', 'option') ? get_field('lloc_recollida_tornada', 'option') : array();
 $numOcupants = get_field('num_ocupants_maxim', 'options') ? get_field('num_ocupants_maxim', 'options') : 6;
+$temporades = get_field('temporades', 'option') ? get_field('temporades', 'option') : array();
 $page_reserva = get_field('page_reserva', 'options');
-$furgos = get_posts(array(
-        'post_type' => 'furgoneta',
-        'post_status' => 'publish'
-));
+
+//TODO: ??
+$t1 = $temporades["temporada_1"]["rangs_temporada_t1"];
+$t2 = $temporades["temporada_2"]["rangs_temporada_t2"];
+$t3 = $temporades["temporada_3"]["rangs_temporada_t3"];
+$t4 = $temporades["temporada_4"]["rangs_temporada_t4"];
+
+$res = array();
+foreach ($t1 as $e){
+    foreach ($e as $i){
+	    array_push($res, "'".$i."'");
+    }
+}
+$temp1Filtrada = implode(',',$res);
+
 
 
 $id = wp_insert_post(array(
@@ -47,8 +59,8 @@ $postID = update_field('data_fi', $dateF, $id);
 				<input type="hidden" name="action" value="reserva_form">
 
                 <div class="form-group row">
-                    <label for="lloc-tornada" class="col-sm-2 col-form-label">Numero d'ocupants</label>
-                    <div class="col-sm-10">
+                    <label for="lloc-tornada" class="col-sm-3 col-form-label">Numero d'ocupants</label>
+                    <div class="col-sm-9">
                         <select class="form-control" name="ocupants" id="ocupants">
                             <option value="" selected disabled hidden>Escull una opció</option>
 							<?php for($i =1;$i<=$numOcupants;$i++) : ?>
@@ -57,15 +69,15 @@ $postID = update_field('data_fi', $dateF, $id);
                         </select>
                     </div>
                 </div>
-                    <div class="form-check row animals hide">
+                    <div class="form-group row animals hide">
 
-                        <label class="form-check-label" for="animals-check">
+                        <label class="col-sm-3 col-form-label" for="animals-check">
                             Viatges amb animals?
                         </label>
-                        <div class="radio">
+                        <div class="col-sm-4">
                             <label><input type="radio" name="opcio-animals" value="Yes">Si</label>
                         </div>
-                        <div class="radio">
+                        <div class="col-sm-4">
                             <label><input type="radio" name="opcio-animals" value="No">No</label>
                         </div>
 
@@ -73,31 +85,24 @@ $postID = update_field('data_fi', $dateF, $id);
 
                     <br>
 
-                    <div class="form-group row hide">
-                        <label for="furgoneta" class="col-sm-2 col-form-label">Tria la teva furgo</label>
-                        <div class="col-sm-10">
-                            <select class="form-control" name="furgo">
-                                <?php
-                                global $post;
-                                foreach($furgos as $post) : setup_postdata($post);  ?>
-                                    <option value="<?php the_title(); ?>"><?php the_title(); ?></option>
-                                <?php
-                                wp_reset_postdata();
-                                endforeach; ?>
+                    <div class="form-group row furgos hide">
+                        <label for="furgoneta" class="col-sm-3 col-form-label">Furgonetes disponibles</label>
+                        <div class="col-sm-9">
+                            <select class="form-control select-furgos selectpicker" name="furgo">
                             </select>
                         </div>
                     </div>
 
-                    <div class="form-group row hide">
-                        <label for="data-ini" class="col-sm-2 col-form-label">Data inici</label>
-                        <div class="col-sm-10">
+                    <div class="form-group row calendar-ini hide">
+                        <label for="data-ini" class="col-sm-3 col-form-label">Data inici</label>
+                        <div class="col-sm-9">
                             <input type="text" class="form-control" id="datepicker-ini" name="datepicker-ini" >
                         </div>
                     </div>
 
-                    <div class="form-group row hide">
-                        <label for="data-fi" class="col-sm-2 col-form-label">Data Fi</label>
-                        <div class="col-sm-10">
+                    <div class="form-group row calendar-fi hide">
+                        <label for="data-fi" class="col-sm-3 col-form-label">Data Fi</label>
+                        <div class="col-sm-9">
                             <input type="text" class="form-control" id="datepicker-fi" name="datepicker-fi" >
                         </div>
                     </div>
@@ -126,7 +131,7 @@ $postID = update_field('data_fi', $dateF, $id);
                         </div>
                     <?php endfor; ?>
 
-                    <button type="submit" class="btn btn-primary btn-lg hide">CERCAR</button>
+                    <button type="submit" class="btn btn-primary btn-lg hide">RESERVA</button>
 
 				<?php wp_nonce_field( 'post_form_reserva', 'nonce_field' ); ?>
 			</form>
@@ -136,6 +141,10 @@ $postID = update_field('data_fi', $dateF, $id);
 	</div>
 
 
+<?php echo '<script>
+    var temp1 = ['.$temp1Filtrada.']
+</script>'
+?>
 
 
 

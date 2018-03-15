@@ -71,3 +71,74 @@ register_post_type('reserva', array(
 	'has_archive' => 'reserva',
 	'show_in_nav_menus' => true
 ));
+
+if(is_admin()){
+	add_action( 'wp_ajax_vans_available', 'vans_available' );
+	add_action( 'wp_ajax_nopriv_vans_available', 'vans_available' );
+
+	add_action( 'wp_ajax_vans_prices', 'vans_prices' );
+	add_action( 'wp_ajax_nopriv_vans_prices', 'vans_prices' );
+}
+
+function vans_available(){
+	global $wpdb;
+	$ocupants = filter_input(INPUT_GET, 'ocupants', FILTER_SANITIZE_SPECIAL_CHARS);
+	$animals = filter_input(INPUT_GET, 'animals', FILTER_SANITIZE_SPECIAL_CHARS);
+
+	if($animals == 0){
+		$argsAnimals =array();
+	}else{
+		$argsAnimals = array(
+			'key'		=> 'accepta_animals',
+			'compare'	=> '=',
+			'value'		=> $animals,
+		);
+	}
+
+	$args = array(
+		'post_type' => 'furgoneta',
+		'post_status' => 'publish',
+		'meta_query' => array(
+			'relation'		=> 'AND',
+			array(
+				'key'		=> 'ocupants_reserva',
+				'compare'	=> '>=',
+				'value'		=> $ocupants,
+			),
+			$argsAnimals,
+			array(
+				'key' => 'total_furgonetes',
+				'compare' => '>=',
+				'value' => 1
+			),
+		),
+		'order' => 'ASC',
+		'fields' => 'ids'
+	);
+	$furgosIDs = query_posts($args);
+	$res = array();
+	foreach ($furgosIDs as $f) {
+		$tmp = array(
+			'id' => $f,
+			'title' => get_the_title($f),
+			'thumbnail' => get_the_post_thumbnail_url($f)
+		);
+		array_push($res, $tmp);
+	}
+
+	echo json_encode($res);
+	wp_die();
+}
+
+function vans_prices(){
+	global $wpdb;
+	$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_SPECIAL_CHARS);
+	$res = array(
+		'preu_t1' => get_field('preu_dia_t1', $id),
+		'preu_t2' => get_field('preu_dia_t2', $id),
+		'preu_t3' => get_field('preu_dia_t3', $id),
+		'preu_t4' => get_field('preu_dia_t4', $id),
+	);
+	echo json_encode($res);
+	wp_die();
+}

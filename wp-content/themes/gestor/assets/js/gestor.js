@@ -8,28 +8,95 @@
     
     function bookingProcess() {
         var checkAnimals = $('.animals');
+        var listVans = $('.furgos');
+        var calendarIni = $('.calendar-ini');
         var numOcupants, animals;
         $('#ocupants, input[type=radio][name=opcio-animals]').on('change', function (e) {
-
+            e.preventDefault();
+            e.stopPropagation();
             var currentElement = $(e.target)[0].id;
             if(currentElement === 'ocupants')
                 numOcupants = this.value;
             else
                 animals = this.value;
 
-            if(checkAnimals.hasClass('hide')){
-                checkAnimals.removeClass('hide');
-            }
-
+            removeHideClass(checkAnimals);
             if(numOcupants && animals){
                 console.log('peticio');
                 //fer peticio ajax
+                getVans(numOcupants, animals).then(function (response) {
+                    if(response.length > 0){
+                        var selectFurgos = $('.select-furgos');
+                        items = response;
+                        selectFurgos.find('option').remove().end();
+                        selectFurgos.append('<option value="" selected disabled hidden>Tria la teva furgo</option>');
+                        //TODO: Afegir imatges a les options del select.
+                        $.each(items, function (i, item) {
+                            selectFurgos.append($('<option> ', {
+                                value: item.title,
+                                text : item.title,
+                                class: 'option-furgo'
+                            }));
+                        });
+                        removeHideClass(listVans);
+                        //TODO: Repassar perquè fa més d'una petició
+                        selectFurgos.on('change', function (e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            initCalendar();
+                            var nomFurgo = $(this).val();
+                            var idFurgo = checkSelectedFurgo(nomFurgo, items);
+                            if(idFurgo !== -1){
+                                getPriceVanSeason(idFurgo).then(function (response) {
+                                    console.log(response);
+                                });
+                            }
+
+
+                            removeHideClass(calendarIni);
+                        });
+                    }else{
+                        addHideClass(listVans);
+                        addHideClass(calendarIni);
+                    }
+
+                });
             }
 
         });
 
 
 
+    }
+
+    function getVans(ocupants, animals) {
+        var boolAnimals = animals ==='Yes' ? 1 : 0;
+
+        var data = {
+            'action': 'vans_available',
+            'ocupants': ocupants,
+            'animals': boolAnimals,
+            'lang': ajax_object.lang
+        };
+        return jQuery.getJSON(ajax_object.ajax_url, data);
+    }
+    
+    function getPriceVanSeason(id) {
+
+        var data = {
+            'action': 'vans_prices',
+            'id': id,
+            'lang': object_van.lang
+        };
+        return jQuery.getJSON(object_van.ajax_url, data);
+    }
+
+    function checkSelectedFurgo(nomFurgo, items) {
+        var element = $.grep(items, function(e){ return e.title === nomFurgo; });
+        if(element.length > 0)
+            return element[0].id;
+        else
+            return -1;
     }
 
 
@@ -55,10 +122,10 @@
         $.datepicker.setDefaults($.datepicker.regional['es']);
 
         $("#datepicker-ini").datepicker({
-            minDate: '+2D',
+            minDate: '+1D',
         });
         $("#datepicker-fi").datepicker({
-            minDate: '+2D',
+            minDate: '+3D',
             defaultDate: +7
 
         });
@@ -66,7 +133,7 @@
          * TODO: Canviar manera d'indicar el valor al datepicker
          */
         var someDate = new Date();
-        var dd = someDate.getDate() + 2;
+        var dd = someDate.getDate() + 1;
         var dd2 = someDate.getDate() + 7;
         var mm = someDate.getMonth() + 1;
         var y = someDate.getFullYear();
@@ -103,6 +170,31 @@
 
         });
 
+    }
+
+    function removeHideClass(element){
+        if(element.hasClass('hide')){
+            element.removeClass('hide');
+        }
+    }
+    function addHideClass(element) {
+        if(!element.hasClass('hide')){
+            element.addClass('hide');
+        }
+    }
+    function parseDataDropdown(items) {
+        var res = [];
+        $.each(items, function (i, item) {
+            var tmp = {
+                'text': item.title,
+                'value': item.title,
+                'selected': false,
+                'description': '',
+                'imageSrc': item.thumbnail
+            };
+            res.push(tmp);
+        });
+        return res;
     }
 
 })(jQuery);

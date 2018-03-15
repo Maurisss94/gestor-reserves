@@ -27,6 +27,10 @@ function gestor_enqueue_scripts(){
 	wp_register_script('gestor-reserves', get_template_directory_uri() . '/assets/js/gestor.js', array('jquery', 'bootstrap', 'jquery-ui'), '1.0', true);
 	wp_enqueue_script('gestor-reserves');
 
+
+	wp_localize_script('gestor-reserves', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'lang' => ICL_LANGUAGE_CODE));
+	wp_localize_script('gestor-reserves', 'object_van', array('ajax_url' => admin_url('admin-ajax.php'), 'lang' => ICL_LANGUAGE_CODE));
+
 }
 
 add_action('wp_enqueue_scripts', 'gestor_enqueue_scripts');
