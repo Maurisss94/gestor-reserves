@@ -73,14 +73,14 @@ register_post_type('reserva', array(
 ));
 
 if(is_admin()){
-	add_action( 'wp_ajax_vans_available', 'vans_available' );
-	add_action( 'wp_ajax_nopriv_vans_available', 'vans_available' );
+	add_action( 'wp_ajax_vans_available', 'gestor_vans_available' );
+	add_action( 'wp_ajax_nopriv_vans_available', 'gestor_vans_available' );
 
-	add_action( 'wp_ajax_vans_prices', 'vans_prices' );
-	add_action( 'wp_ajax_nopriv_vans_prices', 'vans_prices' );
+	add_action( 'wp_ajax_vans_prices', 'gestor_vans_prices' );
+	add_action( 'wp_ajax_nopriv_vans_prices', 'gestor_vans_prices' );
 }
 
-function vans_available(){
+function gestor_vans_available(){
 	global $wpdb;
 	$ocupants = filter_input(INPUT_GET, 'ocupants', FILTER_SANITIZE_SPECIAL_CHARS);
 	$animals = filter_input(INPUT_GET, 'animals', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -129,8 +129,73 @@ function vans_available(){
 	echo json_encode($res);
 	wp_die();
 }
+function gestor_get_reserved_vans() {
+	global $wpdb;
+	$id = filter_input(INPUT_GET, 'id_furgo', FILTER_SANITIZE_SPECIAL_CHARS);
+	$d1 = filter_input(INPUT_GET, 'data_ini', FILTER_SANITIZE_SPECIAL_CHARS);
+	$d2  ="";
+	//$animals = filter_input(INPUT_GET, 'animals', FILTER_SANITIZE_SPECIAL_CHARS);
 
-function vans_prices(){
+	$argsReserva = array(
+		'post_type' => 'reserva',
+		'post_status' => 'publish',
+		'meta_query' => array(
+			'relation' => 'OR',
+			array(
+				'relation'		    => 'AND',
+				array(
+					'key'		=> 'data_fi',
+					'compare'	=> '>=',
+					'value'	=> $d2,
+					'type'          => 'DATE',
+				),
+				array(
+					'key'		=> 'data_inici',
+					'compare'	=> '<=',
+					'value'	=> $d1,
+					'type'         => 'DATE',
+				),
+			),
+			array(
+				'relation'		    => 'AND',
+				array(
+					'key'		=> 'data_inici',
+					'compare'	=> '>=',
+					'value'	=> $d1,
+					'type'          => 'DATE',
+				),
+				array(
+					'key'		=> 'data_inici',
+					'compare'	=> '<=',
+					'value'	=> $d2,
+					'type'         => 'DATE',
+				),
+			),
+			array(
+				'relation'		    => 'AND',
+				array(
+					'key'		=> 'data_fi',
+					'compare'	=> '<=',
+					'value'	=> $d2,
+					'type'          => 'DATE',
+				),
+				array(
+					'key'		=> 'data_fi',
+					'compare'	=> '>=',
+					'value'	=> $d1,
+					'type'         => 'DATE',
+				),
+			)
+
+		),
+		'fields' => 'ids'
+	);
+	$reserves = query_posts($argsReserva);
+
+	return $reserves;
+}
+
+function gestor_vans_prices(){
 	global $wpdb;
 	$id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_SPECIAL_CHARS);
 	$res = array(

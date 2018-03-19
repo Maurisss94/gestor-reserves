@@ -10,6 +10,7 @@
         var checkAnimals = $('.animals');
         var listVans = $('.furgos');
         var calendarIni = $('.calendar-ini');
+        var calendarFi = $('.calendar-fi');
         var numOcupants, animals;
         $('#ocupants, input[type=radio][name=opcio-animals]').on('change', function (e) {
             e.preventDefault();
@@ -48,12 +49,62 @@
                             var idFurgo = checkSelectedFurgo(nomFurgo, items);
                             if(idFurgo !== -1){
                                 getPriceVanSeason(idFurgo).then(function (response) {
-                                    console.log(response);
+                                    var preus = response;
+                                    if(preus.preu_t1 !== null){
+                                        removeHideClass(calendarIni);
+                                        $("#datepicker-ini").datepicker("destroy");
+                                        $("#datepicker-ini").datepicker({
+                                            prevText: "<",
+                                            nextText: ">",
+                                            minDate: '+1D',
+                                            beforeShowDay: function (date) {
+                                                var selectable = true,
+                                                    style = '',
+                                                    popup = '';
+
+                                                var day = date.getDate();
+                                                day = (day < 10) ? '0'+day : day;
+                                                var month = parseInt(date.getMonth())+1;
+                                                month = (month < 10) ? '0'+month : month;
+                                                var formatDate = month + "/" + day + "/" + date.getFullYear();
+                                                //comprovem temporades
+                                                for(var i = 0;i<temporades.length;i++){
+                                                    for(var j = 0;j<temporades[i].length;j++){
+                                                        var newDate = new Date(formatDate);
+                                                        var dIni = new Date(temporades[i][j].data_inici);
+                                                        var dFi = new Date(temporades[i][j].data_fi);
+                                                        if(newDate >=  dIni && newDate <= dFi){
+                                                            switch(i) {
+                                                                case 0:
+                                                                    popup = preus.preu_t1 + ' €';
+                                                                    break;
+                                                                case 1:
+                                                                    popup = preus.preu_t2 + ' €';
+                                                                    break;
+                                                                case 2:
+                                                                    popup = preus.preu_t3 + ' €';
+                                                                    break;
+                                                                case 3:
+                                                                    popup = preus.preu_t4 + ' €';
+                                                                    break;
+                                                                default:
+                                                                    popup = 0;
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                                //comprovem disponibilitat furgo amb id = idFurgo
+
+                                                return [selectable, style, popup];
+                                            }
+                                        });
+                                    }else{
+                                        addHideClass(calendarIni);
+                                    }
                                 });
                             }
 
-
-                            removeHideClass(calendarIni);
                         });
                     }else{
                         addHideClass(listVans);
@@ -64,8 +115,6 @@
             }
 
         });
-
-
 
     }
 
@@ -121,9 +170,7 @@
         };
         $.datepicker.setDefaults($.datepicker.regional['es']);
 
-        $("#datepicker-ini").datepicker({
-            minDate: '+1D',
-        });
+
         $("#datepicker-fi").datepicker({
             minDate: '+3D',
             defaultDate: +7
@@ -181,20 +228,6 @@
         if(!element.hasClass('hide')){
             element.addClass('hide');
         }
-    }
-    function parseDataDropdown(items) {
-        var res = [];
-        $.each(items, function (i, item) {
-            var tmp = {
-                'text': item.title,
-                'value': item.title,
-                'selected': false,
-                'description': '',
-                'imageSrc': item.thumbnail
-            };
-            res.push(tmp);
-        });
-        return res;
     }
 
 })(jQuery);

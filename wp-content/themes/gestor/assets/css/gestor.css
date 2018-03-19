@@ -37,3 +37,31 @@
 .hide {
     display: none;
 }
+
+/** CALENDAR **/
+.ui-datepicker-calendar tbody td:after {
+    content: attr(title);
+    z-index: 20;
+    background: #727272;
+    color: #fff;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 14px;
+    min-width: 70px;
+    top: -44px;
+    font-weight: 700;
+}
+.ui-datepicker-calendar tbody td:hover:after,  .ui-datepicker-calendar tbody td:hover:before{
+     display: block;
+}
+.ui-datepicker-calendar tbody td:after, .ui-datepicker-calendar tbody td:before {
+    position: absolute;
+    display: none;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+}
+
+.ui-datepicker-calendar tbody td {
+    position: relative;
+}

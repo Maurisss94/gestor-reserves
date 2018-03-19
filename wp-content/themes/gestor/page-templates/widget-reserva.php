@@ -14,21 +14,23 @@ $optionsRecollida = get_field('lloc_recollida_tornada', 'option') ? get_field('l
 $numOcupants = get_field('num_ocupants_maxim', 'options') ? get_field('num_ocupants_maxim', 'options') : 6;
 $temporades = get_field('temporades', 'option') ? get_field('temporades', 'option') : array();
 $page_reserva = get_field('page_reserva', 'options');
+$temps = array();
 
-//TODO: ??
+//TODO: REcollir temporades, es podria fer millor
 $t1 = $temporades["temporada_1"]["rangs_temporada_t1"];
 $t2 = $temporades["temporada_2"]["rangs_temporada_t2"];
 $t3 = $temporades["temporada_3"]["rangs_temporada_t3"];
 $t4 = $temporades["temporada_4"]["rangs_temporada_t4"];
 
-$res = array();
-foreach ($t1 as $e){
-    foreach ($e as $i){
-	    array_push($res, "'".$i."'");
-    }
-}
-$temp1Filtrada = implode(',',$res);
-
+$t1Filtrada = gestor_filter_season($t1);
+$t2Filtrada = gestor_filter_season($t2);
+$t3Filtrada = gestor_filter_season($t3);
+$t4Filtrada = gestor_filter_season($t4);
+array_push($temps, $t1Filtrada);
+array_push($temps, $t2Filtrada);
+array_push($temps, $t3Filtrada);
+array_push($temps, $t4Filtrada);
+$tempFiltrada = json_encode($temps);
 
 
 $id = wp_insert_post(array(
@@ -37,8 +39,8 @@ $id = wp_insert_post(array(
 	'post_type'=>'reserva',
 	'post_status'  => 'publish'
 ));
-$dateI = gestor_createData('1/03/2018', 'd/m/Y');
-$dateF = gestor_createData('8/03/2018', 'd/m/Y');
+$dateI = gestor_createData('18/03/2018', 'd/m/Y');
+$dateF = gestor_createData('24/03/2018', 'd/m/Y');
 
 $postID = update_field('id_furgoneta', '800', $id);
 $postID = update_field('data_inici', $dateI, $id);
@@ -139,12 +141,9 @@ $postID = update_field('data_fi', $dateF, $id);
 		</div>
 
 	</div>
-
-
-<?php echo '<script>
-    var temp1 = ['.$temp1Filtrada.']
-</script>'
-?>
+<script>
+    var temporades  = <?php echo $tempFiltrada; ?>;
+</script>
 
 
 
