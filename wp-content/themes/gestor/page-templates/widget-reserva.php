@@ -26,13 +26,13 @@ $t1Filtrada = gestor_filter_season($t1);
 $t2Filtrada = gestor_filter_season($t2);
 $t3Filtrada = gestor_filter_season($t3);
 $t4Filtrada = gestor_filter_season($t4);
-array_push($temps, $t1Filtrada);
-array_push($temps, $t2Filtrada);
-array_push($temps, $t3Filtrada);
-array_push($temps, $t4Filtrada);
+array_push($temps, $t1Filtrada, $t2Filtrada, $t3Filtrada, $t4Filtrada);
 $tempFiltrada = json_encode($temps);
 
 
+
+
+//Test per insertar dos reserves
 $id = wp_insert_post(array(
     'ID' => '860',
 	'post_title'=>'test',
@@ -42,7 +42,20 @@ $id = wp_insert_post(array(
 $dateI = gestor_createData('18/03/2018', 'd/m/Y');
 $dateF = gestor_createData('24/03/2018', 'd/m/Y');
 
-$postID = update_field('id_furgoneta', '800', $id);
+$postID = update_field('id_furgoneta', '135', $id);
+$postID = update_field('data_inici', $dateI, $id);
+$postID = update_field('data_fi', $dateF, $id);
+
+$id = wp_insert_post(array(
+	'ID' => '861',
+	'post_title'=>'test1',
+	'post_type'=>'reserva',
+	'post_status'  => 'publish'
+));
+$dateI = gestor_createData('25/03/2018', 'd/m/Y');
+$dateF = gestor_createData('28/03/2018', 'd/m/Y');
+
+$postID = update_field('id_furgoneta', '135', $id);
 $postID = update_field('data_inici', $dateI, $id);
 $postID = update_field('data_fi', $dateF, $id);
 
@@ -114,11 +127,11 @@ $postID = update_field('data_fi', $dateF, $id);
                         if($i == 0):  $llocText ='recollida'; $llocName = 'Lloc de recollida';
                         else: $llocText = 'tornada'; $llocName = 'Lloc de tornada'; endif;
                         ?>
-                        <div class="form-group row hide">
-                            <label for="lloc-<?php echo $llocText; ?>" class="col-sm-2 col-form-label">
+                        <div class="form-group row llocs-recollida-retorn  hide">
+                            <label for="lloc-<?php echo $llocText; ?>" class="col-sm-3 col-form-label">
                                 <?php echo $llocName; ?>
                             </label>
-                            <div class="col-sm-10">
+                            <div class="col-sm-9">
                                 <select class="form-control" name="opcio-<?php echo $llocText; ?>">
                                     <?php
                                     if ( $optionsRecollida ) :  $j=1;
@@ -133,7 +146,7 @@ $postID = update_field('data_fi', $dateF, $id);
                         </div>
                     <?php endfor; ?>
 
-                    <button type="submit" class="btn btn-primary btn-lg hide">RESERVA</button>
+                    <button type="submit" class="btn btn-primary btn-lg hide button-reserva">RESERVA</button>
 
 				<?php wp_nonce_field( 'post_form_reserva', 'nonce_field' ); ?>
 			</form>

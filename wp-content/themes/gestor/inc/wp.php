@@ -78,6 +78,9 @@ if(is_admin()){
 
 	add_action( 'wp_ajax_vans_prices', 'gestor_vans_prices' );
 	add_action( 'wp_ajax_nopriv_vans_prices', 'gestor_vans_prices' );
+
+	add_action( 'wp_ajax_gestor_get_reserved_vans', 'gestor_get_reserved_vans' );
+	add_action( 'wp_ajax_nopriv_gestor_get_reserved_vans', 'gestor_get_reserved_vans' );
 }
 
 function gestor_vans_available(){
@@ -129,70 +132,36 @@ function gestor_vans_available(){
 	echo json_encode($res);
 	wp_die();
 }
+
 function gestor_get_reserved_vans() {
 	global $wpdb;
 	$id = filter_input(INPUT_GET, 'id_furgo', FILTER_SANITIZE_SPECIAL_CHARS);
-	$d1 = filter_input(INPUT_GET, 'data_ini', FILTER_SANITIZE_SPECIAL_CHARS);
-	$d2  ="";
-	//$animals = filter_input(INPUT_GET, 'animals', FILTER_SANITIZE_SPECIAL_CHARS);
+	//$d1 = filter_input(INPUT_GET, 'data_inici', FILTER_SANITIZE_SPECIAL_CHARS);
 
 	$argsReserva = array(
 		'post_type' => 'reserva',
 		'post_status' => 'publish',
-		'meta_query' => array(
-			'relation' => 'OR',
-			array(
-				'relation'		    => 'AND',
-				array(
-					'key'		=> 'data_fi',
-					'compare'	=> '>=',
-					'value'	=> $d2,
-					'type'          => 'DATE',
-				),
-				array(
-					'key'		=> 'data_inici',
-					'compare'	=> '<=',
-					'value'	=> $d1,
-					'type'         => 'DATE',
-				),
-			),
-			array(
-				'relation'		    => 'AND',
-				array(
-					'key'		=> 'data_inici',
-					'compare'	=> '>=',
-					'value'	=> $d1,
-					'type'          => 'DATE',
-				),
-				array(
-					'key'		=> 'data_inici',
-					'compare'	=> '<=',
-					'value'	=> $d2,
-					'type'         => 'DATE',
-				),
-			),
-			array(
-				'relation'		    => 'AND',
-				array(
-					'key'		=> 'data_fi',
-					'compare'	=> '<=',
-					'value'	=> $d2,
-					'type'          => 'DATE',
-				),
-				array(
-					'key'		=> 'data_fi',
-					'compare'	=> '>=',
-					'value'	=> $d1,
-					'type'         => 'DATE',
-				),
-			)
-
-		),
+		'meta_query' => 'id_furgoneta',
+		'meta_value' => $id,
 		'fields' => 'ids'
 	);
 	$reserves = query_posts($argsReserva);
 
-	return $reserves;
+	$res = array();
+	if($reserves) {
+		foreach ($reserves as $idReserva) {
+			$dataInici = get_field('data_inici', $idReserva);
+			$dataFi = get_field('data_fi', $idReserva);
+			$tmp = array(
+				'dIni' => $dataInici,
+				'dFi' => $dataFi
+			);
+			array_push($res, $tmp);
+		}
+	}
+
+	echo json_encode($res);
+	wp_die();
 }
 
 function gestor_vans_prices(){

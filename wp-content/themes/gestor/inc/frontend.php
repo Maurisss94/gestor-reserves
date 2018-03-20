@@ -30,6 +30,7 @@ function gestor_enqueue_scripts(){
 
 	wp_localize_script('gestor-reserves', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'lang' => ICL_LANGUAGE_CODE));
 	wp_localize_script('gestor-reserves', 'object_van', array('ajax_url' => admin_url('admin-ajax.php'), 'lang' => ICL_LANGUAGE_CODE));
+	wp_localize_script('gestor-reserves', 'object_booking', array('ajax_url' => admin_url('admin-ajax.php'), 'lang' => ICL_LANGUAGE_CODE));
 
 }
 
@@ -83,83 +84,6 @@ function gestor_createData($data, $type){
 	$date = DateTime::createFromFormat($type, $dob_str);
 	return $date->format('Ymd');
 }
-
-//function gestor_get_reserved_vans($diaIni, $diaFi){
-//	$d1 = gestor_createData($diaIni, 'd/m/Y');
-//	$d2 = gestor_createData($diaFi, 'd/m/Y');
-//	$argsReserva = array(
-//		'post_type' => 'reserva',
-//		'post_status' => 'publish',
-//		'meta_query' => array(
-//			'relation' => 'OR',
-//			array(
-//				'relation'		    => 'AND',
-//				array(
-//					'key'		=> 'data_fi',
-//					'compare'	=> '>=',
-//					'value'	=> $d2,
-//					'type'          => 'DATE',
-//				),
-//				array(
-//					'key'		=> 'data_inici',
-//					'compare'	=> '<=',
-//					'value'	=> $d1,
-//					'type'         => 'DATE',
-//				),
-//			),
-//			array(
-//				'relation'		    => 'AND',
-//				array(
-//					'key'		=> 'data_inici',
-//					'compare'	=> '>=',
-//					'value'	=> $d1,
-//					'type'          => 'DATE',
-//				),
-//				array(
-//					'key'		=> 'data_inici',
-//					'compare'	=> '<=',
-//					'value'	=> $d2,
-//					'type'         => 'DATE',
-//				),
-//			),
-//			array(
-//				'relation'		    => 'AND',
-//				array(
-//					'key'		=> 'data_fi',
-//					'compare'	=> '<=',
-//					'value'	=> $d2,
-//					'type'          => 'DATE',
-//				),
-//				array(
-//					'key'		=> 'data_fi',
-//					'compare'	=> '>=',
-//					'value'	=> $d1,
-//					'type'         => 'DATE',
-//				),
-//			)
-//
-//		),
-//		'fields' => 'ids'
-//	);
-//	$reserves = query_posts($argsReserva);
-//	$arrayFurgosReserva = array();
-//	//Agafem les furgos que tenen reserva.
-//	foreach ($reserves as $reserva) {
-//		$idFurgo = get_field('id_furgoneta', $reserva);
-//		if (!isset($arrayFurgosReserva[$idFurgo])) {
-//			$arrayFurgosReserva[$idFurgo] = 0;
-//		}
-//		++$arrayFurgosReserva[$idFurgo];
-//	}
-//	$arrayFurgosReservades = array();
-//	foreach ($arrayFurgosReserva as $idFurgo => $count) {
-//		$total = get_field('total_furgonetes', $idFurgo);
-//		if ($total <= $count) {
-//			array_push($arrayFurgosReservades, $idFurgo);
-//		}
-//	}
-//	return $arrayFurgosReservades;
-//}
 
 function gestor_get_available_vans($animals, $ocupants, $arrayFurgosReserva){
 	if($animals == 0){
