@@ -22,7 +22,6 @@ else:
 	$animals = filter_input(INPUT_POST, 'animals-check') == 'Yes' ? 1 : 0;
 
 	$data_filter = gestor_check_datas($diaIni, $diaFI);
-	$diesIntervals = gestor_get_interval_days($diaIni, $diaFI);
 	$llocRecollida_filter = gestor_check_llocs($llocRecollida, $optionsRecollida);
 	$llocRetorn_filter = gestor_check_llocs($llocRetorn, $optionsRecollida);
 
@@ -32,13 +31,13 @@ else:
         'dia-fi' => $diaFI,
         'lloc-recollida' => $llocRecollida_filter,
         'lloc-retorn' => $llocRetorn_filter,
-        'num-dies-reserva' => $diesIntervals,
+        'ocupants' => $ocupants,
+        'animals' => $animals
     );
-	//var_dump($llocRecollida_filter['nom']);
 
     //TODO: Comprovar que els filtres estan correctes, sino redireccionar.
 
-var_dump($_SESSION);
+    var_dump($_SESSION);
 ?>
 
 
@@ -66,31 +65,7 @@ var_dump($_SESSION);
 
     <div class="row">
         <?php get_template_part('template-parts/step/search-results'); ?>
-
-        <div class="col-md-4 ml-auto" id="info-reserva">
-            <div class="card">
-                <div class="card-body">
-                    <h3>La meva reserva</h3>
-                    <h5 class="card-title">Dates</h5>
-                    <p class="card-text">
-					    <?php echo $diaIni . ' -> ' . $diaFI; ?>
-                    </p>
-
-                    <h5 class="card-title">Lloc d'entrega i retorn</h5>
-                    <p class="card-text"><?php echo $llocRecollida_filter['nom'] . ' ('.$llocRetorn_filter['preu'] . '€)'; ?>
-                        <br>
-					    <?php echo $llocRetorn_filter['nom'] . ' ('.$llocRetorn_filter['preu'] . '€)'; ?>
-                    </p>
-
-                    <h5 class="card-title">Número d'ocupants</h5>
-                    <p class="card-text"><?php echo $ocupants; ?></p>
-
-                    <h5 class="card-title">Viatges amb animals?</h5>
-                    <p class="card-text"><?php echo $animals == 1 ? 'Yes': 'No'; ?></p>
-                </div>
-            </div>
-        </div>
-
+        <?php get_template_part('template-parts/resume-form'); ?>
     </div>
 
 </div>
