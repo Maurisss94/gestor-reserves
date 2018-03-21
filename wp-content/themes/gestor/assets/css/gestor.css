@@ -25,17 +25,23 @@
 .available .info, .unavailable .info{
     font-size: 12px
 }
-.available .info h4, .unavailable .info h4{
-    font-size: 14px;
+.available .info h2{
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     margin-bottom: 5px;
+}
+.available .info h3 {
+    font-size: 14px;
 }
 .reserva .row {
     margin-bottom: 20px;
 }
 .hide {
     display: none;
+}
+.no-margin {
+    margin: 0!important;
 }
 
 /** CALENDAR **/
@@ -64,4 +70,44 @@
 
 .ui-datepicker-calendar tbody td {
     position: relative;
+}
+.ui-datepicker-calendar .ui-state-default:after {
+    content: "";
+    height: 3px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+.ui-state-disabled {
+    cursor: not-allowed !important;
+    pointer-events: inherit;
+}
+.svg {
+    width: 75px !important;
+    display: inline-block;
+}
+.info .block {
+    float: left;
+}
+.content-accessoris .item-accessori img{
+    float: left;
+    width: 200px;
+    z-index: 1;
+    position: relative;
+    -webkit-border-radius: 50px;
+    -webkit-background-clip: padding-box;
+    -moz-border-radius: 50px;
+    -moz-background-clip: padding;
+    border-radius: 50px;
+    background-clip: padding-box;
+}
+.content-accessoris .item-accessori {
+    background-color: lightgray;
+}
+.content-accessoris .item-accessori p {
+    height: 100px;
+    padding-left: 120px;
+    padding-right: 60px;
+    width: 100%;
 }

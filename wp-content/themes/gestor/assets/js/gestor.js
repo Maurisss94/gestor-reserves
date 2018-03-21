@@ -1,5 +1,7 @@
 (function ($) {
 
+    var preus, diesReserves;
+
     $(document).ready(function(){
         initStepBar();
         initCalendar();
@@ -11,6 +13,8 @@
         var listVans = $('.furgos');
         var calendarIni = $('.calendar-ini');
         var calendarFi = $('.calendar-fi');
+        var llocs = $('.llocs-recollida-retorn');
+        var buttonReserva = $('.button-reserva');
         var numOcupants, animals;
         $('#ocupants, input[type=radio][name=opcio-animals]').on('change', function (e) {
             e.preventDefault();
@@ -23,7 +27,6 @@
 
             removeHideClass(checkAnimals);
             if(numOcupants && animals){
-                console.log('peticio');
                 //fer peticio ajax
                 getVans(numOcupants, animals).then(function (response) {
                     if(response.length > 0){
@@ -34,7 +37,7 @@
                         //TODO: Afegir imatges a les options del select.
                         $.each(items, function (i, item) {
                             selectFurgos.append($('<option> ', {
-                                value: item.title,
+                                value: item.id,
                                 text : item.title,
                                 class: 'option-furgo'
                             }));
@@ -44,12 +47,19 @@
                         selectFurgos.on('change', function (e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            initCalendar();
-                            var nomFurgo = $(this).val();
-                            var idFurgo = checkSelectedFurgo(nomFurgo, items);
+                            var idF = $(this).val();
+                            var idFurgo = checkSelectedFurgo(idF, items);
+                            addHideClass(calendarFi);
+                            addHideClass(llocs);
+                            addHideClass(buttonReserva);
+                            setDateValues();
                             if(idFurgo !== -1){
                                 getPriceVanSeason(idFurgo).then(function (response) {
-                                    var preus = response;
+                                    preus = response;
+
+                                    getBookingsOfVan(idFurgo).then(function (response) {
+                                        diesReserves = response;
+
                                     if(preus.preu_t1 !== null){
                                         removeHideClass(calendarIni);
                                         $("#datepicker-ini").datepicker("destroy");
@@ -57,51 +67,27 @@
                                             prevText: "<",
                                             nextText: ">",
                                             minDate: '+1D',
-                                            beforeShowDay: function (date) {
-                                                var selectable = true,
-                                                    style = '',
-                                                    popup = '';
-
-                                                var day = date.getDate();
-                                                day = (day < 10) ? '0'+day : day;
-                                                var month = parseInt(date.getMonth())+1;
-                                                month = (month < 10) ? '0'+month : month;
-                                                var formatDate = month + "/" + day + "/" + date.getFullYear();
-                                                //comprovem temporades
-                                                for(var i = 0;i<temporades.length;i++){
-                                                    for(var j = 0;j<temporades[i].length;j++){
-                                                        var newDate = new Date(formatDate);
-                                                        var dIni = new Date(temporades[i][j].data_inici);
-                                                        var dFi = new Date(temporades[i][j].data_fi);
-                                                        if(newDate >=  dIni && newDate <= dFi){
-                                                            switch(i) {
-                                                                case 0:
-                                                                    popup = preus.preu_t1 + ' €';
-                                                                    break;
-                                                                case 1:
-                                                                    popup = preus.preu_t2 + ' €';
-                                                                    break;
-                                                                case 2:
-                                                                    popup = preus.preu_t3 + ' €';
-                                                                    break;
-                                                                case 3:
-                                                                    popup = preus.preu_t4 + ' €';
-                                                                    break;
-                                                                default:
-                                                                    popup = 0;
-                                                            }
-                                                        }
+                                            beforeShowDay: getPricesandAvailability,
+                                            onSelect: function (date, obj) {
+                                                var formatDate = new Date(parseInt(obj.currentMonth+1) + '/' + obj.selectedDay + '/' + obj.currentYear);
+                                                removeHideClass(calendarFi);
+                                                $("#datepicker-fi").datepicker("destroy");
+                                                $("#datepicker-fi").datepicker({
+                                                    minDate: addDays(formatDate, 3),
+                                                    beforeShowDay:getPricesandAvailability,
+                                                    onSelect: function () {
+                                                        removeHideClass(llocs);
+                                                        removeHideClass(buttonReserva);
                                                     }
-
-                                                }
-                                                //comprovem disponibilitat furgo amb id = idFurgo
-
-                                                return [selectable, style, popup];
+                                                });
                                             }
                                         });
+                                        setDateValues();
                                     }else{
                                         addHideClass(calendarIni);
+                                        addHideClass(calendarFi);
                                     }
+                                });
                                 });
                             }
 
@@ -109,6 +95,7 @@
                     }else{
                         addHideClass(listVans);
                         addHideClass(calendarIni);
+                        addHideClass(calendarFi);
                     }
 
                 });
@@ -116,6 +103,65 @@
 
         });
 
+    }
+
+    function getPricesandAvailability(date) {
+        var selectable = true,
+            style = '',
+            popup = '';
+
+        var day = date.getDate();
+        day = (day < 10) ? '0'+day : day;
+        var month = parseInt(date.getMonth())+1;
+        month = (month < 10) ? '0'+month : month;
+        var formatDate = month + "/" + day + "/" + date.getFullYear();
+        //comprovem temporades
+        for(var i = 0;i<temporades.length;i++){
+            for(var j = 0;j<temporades[i].length;j++){
+                var newDate = new Date(formatDate);
+                var dIni = new Date(temporades[i][j].data_inici);
+                var dFi = new Date(temporades[i][j].data_fi);
+                if(newDate >=  dIni && newDate <= dFi){
+                    switch(i) {
+                        case 0:
+                            popup = preus.preu_t1 + ' €';
+                            break;
+                        case 1:
+                            popup = preus.preu_t2 + ' €';
+                            break;
+                        case 2:
+                            popup = preus.preu_t3 + ' €';
+                            break;
+                        case 3:
+                            popup = preus.preu_t4 + ' €';
+                            break;
+                        default:
+                            popup = 0;
+                    }
+                }
+            }
+
+        }
+        for(var i = 0;i<diesReserves.length;i++){
+            var newDate = new Date(formatDate);
+            var dIni = new Date(diesReserves[i].dIni);
+            var dFi = new Date(diesReserves[i].dFi);
+            if(newDate >=  dIni && newDate <= dFi){
+                selectable = false;
+            }
+        }
+        return [selectable, style, popup];
+    }
+
+    function getBookingsOfVan(idFurgo){
+
+        var data = {
+            'action': 'gestor_get_reserved_vans',
+            'id_furgo': idFurgo,
+            'lang': ajax_object.lang
+        };
+
+        return jQuery.getJSON(object_booking.ajax_url, data);
     }
 
     function getVans(ocupants, animals) {
@@ -140,8 +186,8 @@
         return jQuery.getJSON(object_van.ajax_url, data);
     }
 
-    function checkSelectedFurgo(nomFurgo, items) {
-        var element = $.grep(items, function(e){ return e.title === nomFurgo; });
+    function checkSelectedFurgo(idF, items) {
+        var element = $.grep(items, function(e){ return e.id === parseInt(idF); });
         if(element.length > 0)
             return element[0].id;
         else
@@ -170,30 +216,12 @@
         };
         $.datepicker.setDefaults($.datepicker.regional['es']);
 
-
-        $("#datepicker-fi").datepicker({
-            minDate: '+3D',
-            defaultDate: +7
-
-        });
-        /**
-         * TODO: Canviar manera d'indicar el valor al datepicker
-         */
-        var someDate = new Date();
-        var dd = someDate.getDate() + 1;
-        var dd2 = someDate.getDate() + 7;
-        var mm = someDate.getMonth() + 1;
-        var y = someDate.getFullYear();
-
-        var someFormattedDate = dd + '/' + mm + '/' + y;
-        var someFormattedDateFi = dd2 + '/' + mm + '/' + y;
-
-        $("#datepicker-ini").attr("value", someFormattedDate);
-        $("#datepicker-fi").attr("value", someFormattedDateFi);
     }
 
-
-
+    function setDateValues() {
+        $("#datepicker-ini")[0].value = "Dia de sortida";
+        $("#datepicker-fi")[0].value = "Dia de tornada";
+    }
 
     function initStepBar() {
         $('.next').click(function(){
@@ -229,5 +257,11 @@
             element.addClass('hide');
         }
     }
+    function addDays(date, days) {
+        var dat = date;
+        dat.setDate(dat.getDate() + days);
+        return dat;
+    }
+
 
 })(jQuery);
