@@ -85,66 +85,19 @@ function gestor_createData($data, $type){
 	return $date->format('Ymd');
 }
 
-function gestor_get_available_vans($animals, $ocupants, $arrayFurgosReserva){
-	if($animals == 0){
-		$argsAnimals =array();
-	}else{
-		$argsAnimals = array(
-			'key'		=> 'accepta_animals',
-			'compare'	=> '=',
-			'value'		=> $animals,
-		);
+function gestor_calc_price($mapPreus){
+	$nDies = 0;
+	$prices = 0;
+	foreach ($mapPreus as $preus) {
+		$nDies += $preus['num-dies'];
+		$prices +=  $preus['preu'];
 	}
-
-	$args = array(
-		'post_type' => 'furgoneta',
-		'post_status' => 'publish',
-		'meta_query' => array(
-			'relation'		=> 'AND',
-			array(
-				'key'		=> 'ocupants_reserva',
-				'compare'	=> '>=',
-				'value'		=> $ocupants,
-			),
-			$argsAnimals,
-			array(
-				'key' => 'total_furgonetes',
-				'compare' => '>=',
-				'value' => 1
-			),
-		),
-		'post__not_in'     => $arrayFurgosReserva,
-		'order' => 'ASC',
-		'fields' => 'ids'
-	);
-	$furgosDisponibes = query_posts($args);
-
-	return $furgosDisponibes;
-}
-
-function gestor_get_unavailable_vans($furgosReservades){
-	$args = array(
-		'post_type' => 'furgoneta',
-		'post_status' => 'publish',
-		'post__not_in'     => $furgosReservades,
-		'order' => 'ASC',
-		'fields' => 'ids'
-	);
-	$furgosNoDisponibes = query_posts($args);
-	return $furgosNoDisponibes;
-}
-
-function gestor_calc_price($preuDia, $dies){
-	return ($preuDia * $dies);
+	return ($nDies * $prices);
 }
 
 function gestor_get_interval_days($diaIni, $diaFI){
-	$date = str_replace('/', '-', $diaIni);
-	$date2 = str_replace('/', '-', $diaFI);
-	$dataI =  new DateTime($date);
-	$dataF =  new DateTime($date2);
-	$intervalDies = date_diff($dataI, $dataF);
-	return intval($intervalDies->format('%R%a'));
+	$intervalDies = date_diff($diaIni, $diaFI);
+	return intval($intervalDies->format('%R%a'))+ 1;
 }
 
 function gestor_filter_season($temp) {
@@ -153,5 +106,71 @@ function gestor_filter_season($temp) {
 		array_push($res, $e);
 	}
 
+	return $res;
+}
+function gestor_get_datetime($d, $type){
+	return date_create_from_format($type, $d);
+}
+function checkSeason($dIni, $dFi, $t, $furgoneta) {
+	$preuT1 = get_field('preu_dia_t1', $furgoneta);
+	$preuT2 = get_field('preu_dia_t2', $furgoneta);
+	$preuT3 = get_field('preu_dia_t3', $furgoneta);
+	$preuT4 = get_field('preu_dia_t4', $furgoneta);
+	$res = array(
+		't1' => array(),
+		't2' => array(),
+		't3' => array(),
+		't4' => array()
+	);
+	$dateTime1 = gestor_get_datetime($dIni, 'd/m/Y');
+	$dateTime2 = gestor_get_datetime($dFi, 'd/m/Y');
+	$diesTotals = gestor_get_interval_days($dateTime1, $dateTime2);
+
+	$tempActual = 1; $numDies = 0;
+	foreach ($t as $temp){
+		foreach ($temp as $item) {
+			$dateToCompareIni = gestor_get_datetime($item['data_inici'], 'm/d/Y');
+			$dateToCompareFi = gestor_get_datetime($item['data_fi'], 'm/d/Y');
+			$dataActual = clone $dateTime1;
+
+			for($i = 0;$i < $diesTotals;$i++) {
+
+				if($dataActual >= $dateToCompareIni and $dataActual <= $dateToCompareFi){
+					$numDies++;
+					switch ($tempActual) {
+						case 1:
+							$res['t1'] = array(
+								'preu' => $preuT1,
+								'num-dies' => $numDies
+							);
+							break;
+						case 2:
+							$res['t2'] = array(
+								'preu' => $preuT2,
+								'num-dies' => $numDies
+							);
+							break;
+						case 3:
+							$res['t3'] = array(
+								'preu' => $preuT3,
+								'num-dies' => $numDies
+							);
+							break;
+						case 4:
+							$res['t4'] = array(
+								'preu' => $preuT4,
+								'num-dies' => $numDies
+							);
+							break;
+					}
+				}
+				date_add($dataActual, date_interval_create_from_date_string('1 day'));
+
+			}
+			$numDies = 0;
+
+		}
+		$tempActual++;
+	}
 	return $res;
 }

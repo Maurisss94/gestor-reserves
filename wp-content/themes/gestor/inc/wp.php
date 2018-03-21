@@ -48,6 +48,28 @@ register_post_type('furgoneta', array(
 	'has_archive' => 'furgonetes',
 	'show_in_nav_menus' => true
 ));
+
+register_post_type('accessori', array(
+	'labels' => array(
+		'name' => __('Accessoris', 'bravavans'),
+		'singular_name' => __('Accessori', 'bravavans'),
+		'menu_name' => __('Accessoris', 'bravavans')
+	),
+	'description' => '',
+	'public' => true,
+	'show_ui' => true,
+	'capability_type' => 'post',
+	'map_meta_cap' => true,
+	'publicly_queryable' => true,
+	'exclude_from_search' => false,
+	'hierarchical' => false,
+	'rewrite' => array('slug' => untrailingslashit(_x('accessori', 'post type slug', 'bravavans')), 'with_front' => false, 'feeds' => true),
+	'query_var' => true,
+	'supports' => array('title', 'editor', 'thumbnail', 'custom-fields', 'page-attributes'),
+	'has_archive' => 'accessoris',
+	'show_in_nav_menus' => true
+));
+
 register_post_type('reserva', array(
 	'labels' => array(
 		'name' => __('Reserves', 'bravavans'),
@@ -71,6 +93,7 @@ register_post_type('reserva', array(
 	'has_archive' => 'reserva',
 	'show_in_nav_menus' => true
 ));
+
 
 if(is_admin()){
 	add_action( 'wp_ajax_vans_available', 'gestor_vans_available' );
