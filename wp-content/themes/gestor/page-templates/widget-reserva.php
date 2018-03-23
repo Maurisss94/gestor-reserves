@@ -8,6 +8,9 @@
 /* Template Name: widget-reserva */
 get_header();
 
+$_form_step = filter_input(INPUT_POST, 'step', FILTER_SANITIZE_NUMBER_INT);
+$_form_step = $_form_step === null ? -1 : $_form_step;
+
 $_SESSION['user_id'] = get_current_user_id();
 
 $optionsRecollida = get_field('lloc_recollida_tornada', 'option') ? get_field('lloc_recollida_tornada', 'option') : array();
@@ -59,6 +62,10 @@ $postID = update_field('id_furgoneta', '135', $id);
 $postID = update_field('data_inici', $dateI, $id);
 $postID = update_field('data_fi', $dateF, $id);
 
+if ($_form_step === -1) {
+	$_form_step = 1;
+}
+
 ?>
 
 	<div class="container">
@@ -72,6 +79,7 @@ $postID = update_field('data_fi', $dateF, $id);
 			<form class="col-md-12" action="<?php echo get_permalink($page_reserva); ?>" method="post">
 
 				<input type="hidden" name="action" value="reserva_form">
+				<input type="hidden" name="step" value="1">
 
                 <div class="form-group row">
                     <label for="lloc-tornada" class="col-sm-3 col-form-label">Numero d'ocupants</label>

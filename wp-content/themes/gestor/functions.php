@@ -5,6 +5,11 @@
  * Date: 12/02/18
  * Time: 11:20
  */
+
+if (!session_id()) {
+	session_start();
+}
+
 function gestor_init() {
 
 	require get_template_directory() . '/inc/wp.php';
