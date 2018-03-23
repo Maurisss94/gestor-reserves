@@ -85,14 +85,24 @@ function gestor_createData($data, $type){
 	return $date->format('Ymd');
 }
 
-function gestor_calc_price($mapPreus){
+function gestor_calc_price($mapPreus, $llocRecollida, $llocRetorn, $accessories){
 	$nDies = 0;
 	$prices = 0;
+	$total = 0;
 	foreach ($mapPreus as $preus) {
 		$nDies += $preus['num-dies'];
 		$prices +=  $preus['preu'];
 	}
-	return ($nDies * $prices);
+	$total += ($nDies * $prices);
+	if($llocRecollida && $llocRetorn){
+		$total += $llocRetorn['preu'] + $llocRecollida['preu'];
+	}
+	if($accessories) {
+		foreach ($accessories as $accessory){
+			$total += $accessory['price'];
+		}
+	}
+	return $total;
 }
 
 function gestor_get_interval_days($diaIni, $diaFI){
@@ -111,7 +121,7 @@ function gestor_filter_season($temp) {
 function gestor_get_datetime($d, $type){
 	return date_create_from_format($type, $d);
 }
-function checkSeason($dIni, $dFi, $t, $furgoneta) {
+function gestor_checkSeason($dIni, $dFi, $t, $furgoneta) {
 	$preuT1 = get_field('preu_dia_t1', $furgoneta);
 	$preuT2 = get_field('preu_dia_t2', $furgoneta);
 	$preuT3 = get_field('preu_dia_t3', $furgoneta);
@@ -171,6 +181,29 @@ function checkSeason($dIni, $dFi, $t, $furgoneta) {
 
 		}
 		$tempActual++;
+	}
+	return $res;
+}
+
+function gestor_get_accessories_of_van($accessorisSeleccionats){
+	$sanitized_array = array();
+	$res = array();
+	foreach( $accessorisSeleccionats as $id ) {
+		$sanitized_array[] = intval( $id );
+	}
+	$args = array(
+		'post_type' => 'accessori',
+		'post__in' => $sanitized_array
+	);
+	$accessories = get_posts($args);
+	foreach ($accessories as $accessory) {
+		$tmp = array(
+			'id' => $accessory->ID,
+			'title' => $accessory->post_title,
+			'price' => get_field('preu_accessori', $accessory->ID),
+			'content' => $accessory->post_content
+		);
+		array_push($res, $tmp);
 	}
 	return $res;
 }
