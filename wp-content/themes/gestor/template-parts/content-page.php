@@ -38,7 +38,10 @@ else:
 			'lloc-recollida' => $llocRecollida_filter,
 			'lloc-retorn'    => $llocRetorn_filter,
 			'ocupants'       => $ocupants,
-			'animals'        => $animals
+			'animals'        => $animals,
+			'accessoris'    => array(),
+			'hora-inici'    => '',
+			'hora-fi'       => ''
 		);
 
 	}else if($_form_step > 1) {
@@ -50,13 +53,19 @@ else:
 		$llocRetorn             = $sessio['lloc-retorn'];
 		$ocupants               = $sessio['ocupants'];
 		$animals                = $sessio['animals'] == 'Yes' ? 1 : 0;
+		$accessories            = $sessio['accessoris'];
+		$horaIni                = $sessio['hora-inici'];
+		$horaFi                = $sessio['hora-fi'];
 		if(!empty($_POST['accessories'])){
 			$accessorisSeleccionats = $_POST['accessories'];
 			$accessories = gestor_get_accessories_of_van($accessorisSeleccionats);
+			$_SESSION['info-reserva']['accessoris'] = $accessories;
         }
 		if(!empty($_POST['opcio-hora_inici']) and !empty($_POST['opcio-hora_fi']) and $_POST['check-asseguranca']) {
 		    $horaInici = $_POST['opcio-hora_inici'];
 		    $horaFi = $_POST['opcio-hora_fi'];
+			$_SESSION['info-reserva']['hora-inici'] = $horaInici;
+			$_SESSION['info-reserva']['hora-fi'] = $horaFi;
         }
 
 	}
@@ -73,19 +82,15 @@ else:
 
 <div class="container reserva">
 
-    <div class="progress-container">
-        <ul id="progressbar">
-            <li class="active">Personal Details</li>
-            <li>Social Profiles</li>
-            <li>Account Setup</li>
-        </ul>
-    </div>
+    <?php get_template_part('template-parts/progress-bar'); ?>
 
     <div class="row">
         <div class="col-md-8">
             <?php
             if(!$_POST['check-asseguranca'] && $_form_step == '3'){
                 $_form_step = '2';
+            }else if(!$_POST['dades-name'] && $_form_step == '4'){
+	            $_form_step = '3';
             }
             get_template_part('template-parts/step/step-'.intval($_form_step));
 

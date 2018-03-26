@@ -10,6 +10,7 @@ $hores        = get_field( 'hores_retorn_recollida', 'options' );
 $asseguranca  = get_field( 'asseguranca', 'options' );
 $page_reserva = get_field( 'page_reserva', 'options' );
 
+global $_form_step;
 ?>
 
 <div class="content">

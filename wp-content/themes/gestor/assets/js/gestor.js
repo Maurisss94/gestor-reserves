@@ -1,13 +1,111 @@
 (function ($) {
 
     var preus, diesReserves;
+    var maxDrivers = 1;
+    var currentDrivers = 0;
 
     $(document).ready(function(){
-        initStepBar();
         initCalendar();
         bookingProcess();
+        addSameDriver();
+
     });
     
+    function addSameDriver() {
+        var buttonAdd = $('#sameDriver, .add-driver');
+        var duplicateButton = $('.duplicate-data-container');
+        buttonAdd.on('click', function (e) {
+            addHideClass(duplicateButton);
+            if(e.currentTarget === 'a.add-driver'){
+                e.preventDefault();
+                e.stopPropagation();
+            }else{
+                $(e.currentTarget).prop('checked', false);
+            }
+            if(currentDrivers < maxDrivers) {
+                addDriver(e.currentTarget);
+                removeDriver();
+            }
+        });
+    }
+
+    function removeDriver() {
+        var duplicateButton = $('.duplicate-data-container');
+        var buttonEliminar = $('#driver-'+ currentDrivers +'-removeDriver');
+        var driver = $('.driver');
+        buttonEliminar.on('click', function (e) {
+            if(driver.length >= 1){
+                driver.remove();
+                currentDrivers--;
+                removeHideClass(duplicateButton);
+            }
+        })
+    }
+
+    
+    function addDriver(target) {
+
+        currentDrivers++;
+        var dataDriver = $('.clone');
+        var newDriver = $('#conductors');
+        var cloned = dataDriver.clone().appendTo(newDriver);
+
+        cloned.data('driver-key', currentDrivers);
+        cloned.addClass('driver');
+
+        if(!$(target).hasClass('add-driver')){
+            var items = ['name', 'surnames', 'idNumber', 'email', 'address', 'postalCode', 'city', 'country', 'phoneNumber'];
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var value = $('#dades-' + item).val();
+                $('.driver #driver-clone-' + item).attr('id', "driver-" + currentDrivers + "-" +item);
+                $('.driver #driver-' + currentDrivers + '-' +item).attr('value', value);
+                $('.driver #driver-' + currentDrivers + '-' +item).text(value);
+            }
+        }
+
+        initDriverCalendar();
+        cloned.removeClass('hide clone');
+
+    }
+
+    function initDriverCalendar() {
+
+
+        // Change ids
+        var items = ['licenceExpDate', 'licenceEndDate', 'birthDate', 'licenceNumber', 'removeDriver'];
+        for(var i = 0;i<items.length;i++){
+            var item = items[i];
+            $('.driver #driver-clone-' + item).attr('id', "driver-" + currentDrivers + "-" +item);
+        }
+
+        var date = new Date();
+        var anyActual = date.getFullYear();
+
+        var anyMinim = anyActual - 100;
+        var rang = anyMinim + ":" + anyActual;
+        $('.driver #driver-' + currentDrivers + '-licenceExpDate').datepicker({
+            changeMonth: true,
+            yearRange: rang,
+            changeYear: true
+        });
+        var anyFinal = anyActual + 15;
+        rang = anyActual + ":" + anyFinal;
+        $('.driver #driver-' + currentDrivers + '-licenceEndDate').datepicker({
+            changeMonth: true,
+            yearRange: rang,
+            changeYear: true
+        });
+        rang = anyMinim + ":" + anyActual;
+        $('.driver #driver-' + currentDrivers + '-birthDate').datepicker({
+            changeMonth: true,
+            yearRange: rang,
+            changeYear: true
+        });
+
+
+    }
+
     function bookingProcess() {
         var checkAnimals = $('.animals');
         var listVans = $('.furgos');
@@ -221,30 +319,6 @@
     function setDateValues() {
         $("#datepicker-ini")[0].value = "Dia de sortida";
         $("#datepicker-fi")[0].value = "Dia de tornada";
-    }
-
-    function initStepBar() {
-        $('.next').click(function(){
-
-            var nextId = $(this).parents('.tab-pane').next().attr("id");
-            $('[href=#'+nextId+']').tab('show');
-            return false;
-
-        });
-
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-
-            //update progress
-            var step = $(e.target).data('step');
-            var percent = (parseInt(step) / 5) * 100;
-
-            $('.progress-bar').css({width: percent + '%'});
-            $('.progress-bar').text("Step " + step + " of 5");
-
-            //e.relatedTarget // previous tab
-
-        });
-
     }
 
     function removeHideClass(element){

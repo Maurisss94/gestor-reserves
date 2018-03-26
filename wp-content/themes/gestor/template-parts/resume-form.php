@@ -30,7 +30,6 @@ $animals       = $_SESSION['info-reserva']['animals'];
 $furgoneta     = $_SESSION['info-reserva']['furgoneta'];
 
 $mapPreus = gestor_checkSeason( $diaIni, $diaFi, $temps, $furgoneta );
-
 ?>
 <div class="card">
     <div class="card-body">
@@ -72,7 +71,7 @@ $mapPreus = gestor_checkSeason( $diaIni, $diaFi, $temps, $furgoneta );
             <h5 class="card-title">Accessoris</h5>
             <ul style="list-style: none;margin: 0;padding:0">
 				<?php foreach ( $accessories as $accesori ): ?>
-                    <li><?php echo $accesori['title']; ?></li>
+                    <li><?php echo $accesori['title'] . ' ' .  $accesori['price']. '€' ?></li>
 				<?php endforeach; ?>
             </ul>
 		<?php endif; ?>
